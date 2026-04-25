@@ -1,0 +1,12 @@
+*.zip
+*.xlsx
+*.csv
+
+.DS_Store
+
+preview/
+site/
+github-root-package/
+darkestante-github-root-package-2026-04-24/
+
+/tmp/
