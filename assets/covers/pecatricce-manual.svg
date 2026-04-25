@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Capa manual de Pecatricce</title>
+  <desc id="desc">Capa preta com cruz em fogo e tipografia clara para o livro Pecatricce.</desc>
+  <defs>
+    <linearGradient id="fireMain" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd36a"/>
+      <stop offset="0.18%" stop-color="#ffbf47"/>
+      <stop offset="0.36%" stop-color="#ff7b1f"/>
+      <stop offset="0.62%" stop-color="#ff3b00"/>
+      <stop offset="1" stop-color="#631100"/>
+    </linearGradient>
+    <radialGradient id="fireGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffb54a" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#ff5c1f" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="floorFire" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffb341"/>
+      <stop offset="40%" stop-color="#ff5a0f"/>
+      <stop offset="100%" stop-color="#2a0000"/>
+    </linearGradient>
+    <filter id="blurGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="1200" fill="#040404"/>
+
+  <ellipse cx="400" cy="410" rx="235" ry="290" fill="url(#fireGlow)" filter="url(#blurGlow)"/>
+
+  <path
+    d="M370 86
+       C350 135 342 186 356 244
+       C373 308 356 368 342 436
+       C329 499 330 571 352 655
+       C365 706 370 773 359 848
+       C347 919 356 997 381 1082
+       L420 1082
+       C443 1006 451 930 436 852
+       C421 774 428 704 445 635
+       C466 552 470 492 458 432
+       C445 367 428 309 437 246
+       C445 184 432 133 408 86
+       Z"
+    fill="url(#fireMain)"
+  />
+
+  <path
+    d="M158 345
+       C222 321 282 327 352 344
+       C397 355 443 351 500 342
+       C580 329 642 333 705 357
+       C642 372 583 381 516 384
+       C456 386 411 393 353 406
+       C278 423 218 420 158 394
+       C181 378 188 364 158 345 Z"
+    fill="url(#fireMain)"
+  />
+
+  <path
+    d="M0 1070
+       C55 1010 118 1040 168 989
+       C203 1032 257 986 304 1036
+       C344 975 402 1030 443 982
+       C489 1033 546 976 586 1029
+       C633 970 701 1025 744 982
+       C767 1030 783 1048 800 1070
+       L800 1200 L0 1200 Z"
+    fill="url(#floorFire)"
+  />
+
+  <text x="400" y="425" fill="#c7c7c7" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="92" text-anchor="middle" letter-spacing="8">
+    PECA TRICCE
+  </text>
+  <text x="400" y="720" fill="#f3f1ea" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="88" font-weight="700" text-anchor="middle">
+    Já está disponível
+  </text>
+  <text x="400" y="1010" fill="#e4ddd3" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="74" text-anchor="middle" letter-spacing="6">
+    KADU JUNQUEIRA
+  </text>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" role="img" aria-labelledby="title desc">
+  <title id="title">Slide 3 do topo</title>
+  <desc id="desc">Placeholder para o terceiro slide do Darkestante.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111014"/>
+      <stop offset="50%" stop-color="#221922"/>
+      <stop offset="100%" stop-color="#432226"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="480" fill="url(#bg)"/>
+  <circle cx="1320" cy="350" r="170" fill="rgba(255,255,255,0.05)"/>
+  <circle cx="360" cy="130" r="150" fill="rgba(240,90,63,0.10)"/>
+  <text x="110" y="180" fill="#ffd7cf" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="6">
+    PROJETOS
+  </text>
+  <text x="110" y="260" fill="#fff8f3" font-family="Arial, sans-serif" font-size="64" font-weight="700">
+    Troque por sua arte
+  </text>
+  <text x="110" y="320" fill="#ffe8df" font-family="Arial, sans-serif" font-size="34">
+    para o slide 3
+  </text>
+</svg>

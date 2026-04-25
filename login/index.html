@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Administrativo | Darkestante</title>
+    <meta name="description" content="Área interna de administração do Darkestante." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+      <link rel="canonical" href="https://darkestante.com.br/login/" />
+</head>
+  <body>
+    <div class="page-shell">
+      <div class="book-nav">
+        <a class="back-link" href="index.html">← Voltar para o Darkestante</a>
+      </div>
+
+      <main class="admin-layout">
+        <section class="blog-admin-shell detail-block" aria-labelledby="blog-admin-title">
+          <div class="blog-admin-shell__head">
+            <div>
+              <p class="eyebrow">Painel editorial</p>
+              <h1 id="blog-admin-title" class="detail-block__title">Login Administrativo</h1>
+            </div>
+          </div>
+
+          <div id="blog-admin-auth" class="blog-admin-auth">
+            <label class="filter-field blog-admin-auth__field">
+              <span class="search-field__label">Email</span>
+              <input id="blog-admin-email" type="email" placeholder="Digite seu email editorial" />
+            </label>
+            <label class="filter-field blog-admin-auth__field">
+              <span class="search-field__label">Senha</span>
+              <input id="blog-admin-password" type="password" placeholder="Digite a senha editorial" />
+            </label>
+            <button id="blog-admin-login" class="detail-button detail-button--accent" type="button">
+              Entrar no painel
+            </button>
+          </div>
+
+          <form id="blog-admin-form" class="blog-admin-form hidden">
+            <section class="blog-admin-subsection" aria-labelledby="blog-admin-slider-title">
+              <div class="blog-admin-subsection__head">
+                <div>
+                  <p class="eyebrow">Slideshow do topo</p>
+                  <h2 id="blog-admin-slider-title" class="detail-block__title">Atualizar as 3 faces do banner</h2>
+                </div>
+                <p class="blog-admin-subsection__hint">
+                  Dimensão recomendada: 1920 x 430 px. Use imagens horizontais nessa proporção para encaixar melhor no topo do site.
+                </p>
+              </div>
+
+              <div class="blog-admin-form__grid">
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Slide 1</span>
+                  <input id="hero-slide-1" type="file" accept="image/*" />
+                </label>
+
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Slide 2</span>
+                  <input id="hero-slide-2" type="file" accept="image/*" />
+                </label>
+
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Slide 3</span>
+                  <input id="hero-slide-3" type="file" accept="image/*" />
+                </label>
+              </div>
+
+              <div class="blog-admin-form__actions">
+                <button id="hero-slides-save" class="detail-button" type="button">Aplicar imagens no slideshow</button>
+              </div>
+
+              <p id="hero-slides-feedback" class="blog-admin-feedback hidden"></p>
+            </section>
+
+            <section class="blog-admin-subsection" aria-labelledby="blog-admin-post-title">
+              <div class="blog-admin-subsection__head">
+                <div>
+                  <p class="eyebrow">Novo artigo</p>
+                  <h2 id="blog-admin-post-title" class="detail-block__title">Publicar postagem no blog</h2>
+                </div>
+                <p class="blog-admin-subsection__hint">
+                  Preencha os dados do artigo e publique. O post aparecerá automaticamente
+                  no blog deste navegador com sua própria página interna.
+                </p>
+              </div>
+
+              <div class="blog-admin-form__grid">
+                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                  <span class="search-field__label">Título do artigo</span>
+                  <input id="blog-title" type="text" placeholder="Ex.: Minha cobertura da Bienal de Pernambuco" required />
+                </label>
+
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Categoria</span>
+                  <input id="blog-category" type="text" placeholder="Eventos, Resenha, Editorial..." required />
+                </label>
+
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Data</span>
+                  <input id="blog-date" type="date" required />
+                </label>
+
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Tempo de leitura estimado</span>
+                  <input id="blog-reading-time" type="text" placeholder="Estimado automaticamente" readonly />
+                </label>
+
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Texto da capa editorial</span>
+                  <input id="blog-cover-label" type="text" placeholder="Ex.: Eventos" />
+                </label>
+
+                <label class="filter-field blog-admin-form__field">
+                  <span class="search-field__label">Tags</span>
+                  <input id="blog-tags" type="text" placeholder="terror, bienal, cobertura" />
+                </label>
+
+                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                  <span class="search-field__label">URL do vídeo</span>
+                  <input id="blog-video-url" type="url" placeholder="Link do YouTube ou Vimeo (opcional)" />
+                </label>
+
+                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                  <span class="search-field__label">Imagem de capa</span>
+                  <input id="blog-cover-image" type="file" accept="image/*" />
+                </label>
+
+                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                  <span class="search-field__label">Resumo curto</span>
+                  <textarea id="blog-excerpt" rows="3" placeholder="Resumo que aparece nos cards do blog." required></textarea>
+                </label>
+
+                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                  <span class="search-field__label">Introdução</span>
+                  <textarea id="blog-intro" rows="4" placeholder="Texto de abertura do artigo." required></textarea>
+                </label>
+
+                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                  <span class="search-field__label">Texto do artigo</span>
+                  <textarea id="blog-body" rows="10" placeholder="Escreva o artigo aqui. Separe parágrafos com uma linha em branco." required></textarea>
+                </label>
+              </div>
+
+              <label class="blog-admin-form__checkbox">
+                <input id="blog-featured" type="checkbox" />
+                <span>Destacar este artigo no topo do blog</span>
+              </label>
+
+              <div class="blog-admin-form__actions">
+                <button class="detail-button detail-button--accent" type="submit">Publicar artigo</button>
+                <button id="blog-admin-logout" class="detail-button" type="button">Sair do painel</button>
+              </div>
+
+              <p id="blog-admin-feedback" class="blog-admin-feedback hidden"></p>
+            </section>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="../admin.js"></script>
+  </body>
+</html>

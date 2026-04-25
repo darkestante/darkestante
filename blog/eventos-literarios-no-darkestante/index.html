@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Como o Darkestante vai cobrir eventos literários | Blog | Darkestante</title>
+    <meta name="description" content="Uma prévia de como o blog pode registrar coberturas, impressões, destaques e bastidores de eventos ligados ao livro e ao terror." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+      <link rel="canonical" href="https://darkestante.com.br/blog/eventos-literarios-no-darkestante/" />
+</head>
+  <body>
+    <div class="page-shell">
+      <section class="hero-meta-bar hero-meta-bar--standalone">
+        <div class="hero-meta-bar__socials">
+          <a href="https://www.instagram.com/darkestante_/" target="_blank" rel="noreferrer">Instagram</a>
+          <a href="https://www.tiktok.com/@darkestante" target="_blank" rel="noreferrer">TikTok</a>
+          <a href="https://www.youtube.com/@darkestante" target="_blank" rel="noreferrer">YouTube</a>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Navegação principal">
+        <a class="tab-button" href="../../">Darkestante</a>
+        <a class="tab-button is-active" href="../../blog/">Blog</a>
+        <a class="tab-button" href="../../resenhas/">Resenhas</a>
+        <a class="tab-button" href="../../tribo-da-caveira/">Tribo da Caveira</a>
+        <a class="tab-button" href="../../projetos/torre-negra-expansao/">Projetos</a>
+      </nav>
+
+      <div class="book-nav">
+        <a class="back-link" data-blog-back href="../../blog/">← Voltar para o Blog</a>
+      </div>
+
+      <div id="loading-state" class="feedback-card">Carregando artigo...</div>
+      <div id="error-state" class="feedback-card feedback-card--error hidden">
+        Não foi possível carregar este artigo agora.
+      </div>
+
+      <main id="detail-state" class="blog-post-layout hidden">
+        <article class="blog-post detail-block">
+          <p id="blog-post-category" class="eyebrow"></p>
+          <h1 id="blog-post-title" class="blog-post__title"></h1>
+          <p id="blog-post-meta" class="blog-post__meta"></p>
+          <p id="blog-post-excerpt" class="blog-post__excerpt"></p>
+
+          <div id="blog-post-cover" class="blog-post-cover" aria-hidden="true"></div>
+
+          <div id="blog-post-content" class="blog-post__content"></div>
+
+          <section class="blog-post-share">
+            <h2 class="blog-post-section__title">Compartilhar artigo</h2>
+            <div id="blog-post-share" class="blog-post-share__actions"></div>
+          </section>
+
+          <section class="blog-comments">
+            <h2 class="blog-post-section__title">Comentários</h2>
+            <form id="blog-comment-form" class="blog-comments__form">
+              <label class="filter-field blog-comments__field">
+                <span class="search-field__label">Nome e sobrenome</span>
+                <input id="blog-comment-name" type="text" placeholder="Digite seu nome e sobrenome" />
+              </label>
+
+              <label class="filter-field blog-comments__field">
+                <span class="search-field__label">Comentário</span>
+                <textarea id="blog-comment-text" rows="5" placeholder="Escreva seu comentário sobre o artigo"></textarea>
+              </label>
+
+              <div class="blog-comments__actions">
+                <button class="detail-button detail-button--accent" type="submit">Enviar comentário</button>
+              </div>
+
+              <p id="blog-comment-feedback" class="blog-admin-feedback hidden"></p>
+            </form>
+
+            <div id="blog-comments-list" class="blog-comments__list"></div>
+          </section>
+        </article>
+      </main>
+
+      <footer class="site-footer" aria-labelledby="footer-title">
+        <div class="site-footer__bottom site-footer__bottom--compact">
+          <div class="site-footer__bottom-copy">
+            <p>
+              O Darkestante nasceu da paixão por histórias sombrias. O projeto reúne
+              resenhas, comentários e reflexões sobre livros de terror sobrenatural,
+              explorando desde clássicos do gênero até obras contemporâneas que mantêm
+              viva a tradição do horror na literatura.
+            </p>
+            <p>© 2026 Darkestante — Todos os direitos reservados | <a href="../../login/">login</a></p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="../../blog.js"></script>
+  </body>
+</html>
