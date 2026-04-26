@@ -278,6 +278,7 @@ function initHeroSlider() {
     return;
   }
 
+  ensureHeroSlideImages();
   setHeroSlide(0);
   startHeroSlider();
 }
@@ -298,6 +299,54 @@ function setHeroSlide(index) {
     dot.classList.toggle("is-active", isActive);
     dot.setAttribute("aria-selected", String(isActive));
   });
+
+  syncHeroSliderRatio();
+}
+
+function ensureHeroSlideImages() {
+  elements.heroSlides.forEach((slide, index) => {
+    const source = getHeroSlideSource(slide);
+    if (!source) {
+      return;
+    }
+
+    let image = slide.querySelector(".hero-slide__image");
+    if (!image) {
+      image = document.createElement("img");
+      image.className = "hero-slide__image";
+      image.alt = `Banner Darkestante ${index + 1}`;
+      image.decoding = "async";
+      image.loading = index === 0 ? "eager" : "lazy";
+      image.addEventListener("load", () => syncHeroSliderRatio(slide));
+      slide.appendChild(image);
+    }
+
+    if (image.getAttribute("src") !== source) {
+      image.src = source;
+    }
+  });
+}
+
+function getHeroSlideSource(slide) {
+  const rawValue =
+    slide.style.getPropertyValue("--hero-image") ||
+    window.getComputedStyle(slide).getPropertyValue("--hero-image");
+  const imageValue = rawValue.trim();
+  const urlMatch = imageValue.match(/^url\((['"]?)(.*)\1\)$/);
+
+  return urlMatch ? urlMatch[2] : imageValue;
+}
+
+function syncHeroSliderRatio(slide = elements.heroSlides[currentHeroSlide]) {
+  const image = slide?.querySelector(".hero-slide__image");
+  if (!elements.heroSlider || !image || !image.naturalWidth || !image.naturalHeight) {
+    return;
+  }
+
+  elements.heroSlider.style.setProperty(
+    "--hero-aspect-ratio",
+    `${image.naturalWidth} / ${image.naturalHeight}`
+  );
 }
 
 function startHeroSlider() {
@@ -468,6 +517,8 @@ function applyStoredHeroSlides() {
       slide.style.setProperty("--hero-image", `url('${image}')`);
     }
   });
+
+  ensureHeroSlideImages();
 }
 
 function formatBlogPostMeta(post) {
