@@ -1069,6 +1069,25 @@ select {
   color: var(--muted);
 }
 
+.blog-admin-publish {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(21, 32, 43, 0.08);
+  background: rgba(250, 242, 236, 0.72);
+}
+
+.blog-admin-publish__head {
+  display: grid;
+  gap: 8px;
+}
+
+.blog-admin-token-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .blog-admin-form__actions {
   display: flex;
   flex-wrap: wrap;
@@ -1240,14 +1259,25 @@ select {
   gap: 16px;
 }
 
+.blog-preview-body,
+.blog-copy-stack {
+  display: grid;
+  gap: 16px;
+}
+
 .blog-preview-body {
   color: var(--muted);
   line-height: 1.8;
-  white-space: pre-line;
 }
 
 .blog-preview-body p {
   margin: 0;
+}
+
+.blog-admin-input-help {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
 }
 
 .blog-card {
@@ -1336,6 +1366,81 @@ select {
 .blog-post-video {
   display: grid;
   gap: 14px;
+}
+
+.blog-preview-gallery,
+.blog-post-gallery {
+  display: grid;
+  gap: 14px;
+}
+
+.blog-preview-gallery__stage,
+.blog-post-gallery__stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.blog-preview-gallery__stage img,
+.blog-post-gallery__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.blog-preview-gallery__thumbs,
+.blog-post-gallery__thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.blog-preview-gallery__thumb,
+.blog-post-gallery__thumb {
+  width: 74px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+}
+
+.blog-preview-gallery__thumb img,
+.blog-post-gallery__thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.blog-preview-gallery__thumb.is-active,
+.blog-post-gallery__thumb.is-active {
+  border-color: var(--accent);
+}
+
+.blog-post-gallery__controls {
+  position: absolute;
+  inset: auto 14px 14px auto;
+  display: inline-flex;
+  gap: 10px;
+}
+
+.blog-post-gallery__button {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: rgba(19, 32, 44, 0.78);
+  color: #fff;
+  font-size: 1.55rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.blog-post-gallery__button:hover,
+.blog-post-gallery__button:focus-visible {
+  background: rgba(19, 32, 44, 0.9);
+  outline: none;
 }
 
 .blog-post-share,

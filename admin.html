@@ -160,13 +160,25 @@
                         </label>
 
                         <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
-                          <span class="search-field__label">URL do vídeo</span>
-                          <input id="blog-video-url" type="url" placeholder="Link do YouTube (opcional)" />
+                          <span class="search-field__label">Vídeo do artigo</span>
+                          <textarea
+                            id="blog-video-url"
+                            rows="3"
+                            placeholder="Cole aqui o link do YouTube ou o código de incorporação do vídeo."
+                          ></textarea>
                         </label>
 
                         <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
                           <span class="search-field__label">Imagem de capa</span>
                           <input id="blog-cover-image" type="file" accept="image/*" />
+                        </label>
+
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">Slideshow de fotos do artigo</span>
+                          <input id="blog-gallery-images" type="file" accept="image/*" multiple />
+                          <small class="blog-admin-input-help">
+                            Você pode selecionar várias fotos de uma vez. Elas entrarão em um slideshow dentro do artigo.
+                          </small>
                         </label>
 
                         <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
@@ -190,8 +202,38 @@
                         <span>Destacar este artigo no topo do blog</span>
                       </label>
 
+                      <section class="blog-admin-publish" aria-labelledby="blog-admin-publish-title">
+                        <div class="blog-admin-publish__head">
+                          <div>
+                            <p class="eyebrow">Publicação real</p>
+                            <h3 id="blog-admin-publish-title" class="detail-block__title">Enviar para o blog público</h3>
+                          </div>
+                          <p class="blog-admin-subsection__hint">
+                            O rascunho fica salvo só neste navegador. Para publicar de verdade no site, use o token do GitHub e clique em publicar no site.
+                          </p>
+                        </div>
+
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">Token do GitHub</span>
+                          <input
+                            id="blog-github-token"
+                            type="password"
+                            placeholder="Cole aqui seu token pessoal do GitHub para publicar no blog"
+                            autocomplete="off"
+                          />
+                        </label>
+
+                        <div class="blog-admin-token-actions">
+                          <button id="blog-github-save-token" class="detail-button" type="button">Salvar token neste navegador</button>
+                          <button id="blog-github-clear-token" class="detail-button" type="button">Apagar token salvo</button>
+                        </div>
+
+                        <p id="blog-github-status" class="blog-admin-feedback hidden"></p>
+                      </section>
+
                       <div class="blog-admin-form__actions">
-                        <button id="blog-save" class="detail-button detail-button--accent" type="submit">Salvar artigo</button>
+                        <button id="blog-save" class="detail-button" type="submit">Salvar rascunho neste navegador</button>
+                        <button id="blog-publish-live" class="detail-button detail-button--accent" type="button">Publicar no site</button>
                         <button id="blog-cancel-edit" class="detail-button hidden" type="button">Cancelar edição</button>
                       </div>
 
@@ -231,12 +273,17 @@
                         </div>
                       </div>
 
+                      <div id="blog-preview-gallery" class="blog-post-gallery hidden">
+                        <h4 class="blog-post-section__title">Slideshow de fotos</h4>
+                        <div class="blog-preview-gallery"></div>
+                      </div>
+
                       <div class="blog-preview-content">
                         <section class="blog-post-section">
                           <h4 class="blog-post-section__title">Introdução</h4>
-                          <p id="blog-preview-intro" class="blog-post-section__text">
-                            A introdução aparecerá aqui.
-                          </p>
+                          <div id="blog-preview-intro" class="blog-copy-stack">
+                            <p class="blog-post-section__text">A introdução aparecerá aqui.</p>
+                          </div>
                         </section>
                         <section class="blog-post-section">
                           <h4 class="blog-post-section__title">Corpo do artigo</h4>

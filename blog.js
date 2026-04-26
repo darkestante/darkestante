@@ -57,6 +57,14 @@ function renderPost(post) {
     fragment.appendChild(tagsWrap);
   }
 
+  if (post.intro) {
+    fragment.appendChild(renderTextSection("", post.intro));
+  }
+
+  if (Array.isArray(post.galleryImages) && post.galleryImages.length > 0) {
+    fragment.appendChild(renderGallerySection(post.galleryImages, post.title));
+  }
+
   if (post.videoUrl) {
     const videoWrap = document.createElement("section");
     videoWrap.className = "blog-post-video";
@@ -70,24 +78,13 @@ function renderPost(post) {
   }
 
   post.body.forEach((section) => {
-    const articleSection = document.createElement("section");
-    articleSection.className = "blog-post-section";
-
-    if (section.heading) {
-      const heading = document.createElement("h2");
-      heading.className = "blog-post-section__title";
-      heading.textContent = section.heading;
-      articleSection.appendChild(heading);
+    const textSection = renderTextSection(
+      section.heading || "",
+      Array.isArray(section.paragraphs) ? section.paragraphs.join("\n\n") : ""
+    );
+    if (textSection) {
+      fragment.appendChild(textSection);
     }
-
-    (section.paragraphs || []).forEach((text) => {
-      const paragraph = document.createElement("p");
-      paragraph.className = "blog-post-section__text";
-      paragraph.textContent = text;
-      articleSection.appendChild(paragraph);
-    });
-
-    fragment.appendChild(articleSection);
   });
 
   elements.content.innerHTML = "";
@@ -232,6 +229,111 @@ function renderCover(post) {
   elements.cover.innerHTML = `<span>${post.coverLabel || post.category}</span>`;
 }
 
+function renderTextSection(title, text) {
+  const paragraphs = String(text || "")
+    .split(/\n\s*\n/g)
+    .map((paragraph) => paragraph.replace(/\n+/g, " ").trim())
+    .filter(Boolean);
+
+  if (!paragraphs.length) {
+    return null;
+  }
+
+  const articleSection = document.createElement("section");
+  articleSection.className = "blog-post-section";
+
+  if (title) {
+    const heading = document.createElement("h2");
+    heading.className = "blog-post-section__title";
+    heading.textContent = title;
+    articleSection.appendChild(heading);
+  }
+
+  const bodyStack = document.createElement("div");
+  bodyStack.className = "blog-copy-stack";
+
+  paragraphs.forEach((textValue) => {
+    const paragraph = document.createElement("p");
+    paragraph.className = "blog-post-section__text";
+    paragraph.textContent = textValue;
+    bodyStack.appendChild(paragraph);
+  });
+
+  articleSection.appendChild(bodyStack);
+  return articleSection;
+}
+
+function renderGallerySection(images, title) {
+  const safeImages = Array.isArray(images) ? images.filter(Boolean) : [];
+  if (!safeImages.length) {
+    return null;
+  }
+
+  const section = document.createElement("section");
+  section.className = "blog-post-gallery";
+
+  const heading = document.createElement("h2");
+  heading.className = "blog-post-section__title";
+  heading.textContent = "Galeria de fotos";
+  section.appendChild(heading);
+
+  const stage = document.createElement("div");
+  stage.className = "blog-post-gallery__stage";
+
+  const stageImage = document.createElement("img");
+  stageImage.className = "blog-post-gallery__image";
+  stageImage.src = safeImages[0];
+  stageImage.alt = `${title} — foto 1`;
+  stage.appendChild(stageImage);
+
+  if (safeImages.length > 1) {
+    const controls = document.createElement("div");
+    controls.className = "blog-post-gallery__controls";
+    controls.innerHTML = `
+      <button class="blog-post-gallery__button" type="button" aria-label="Foto anterior">‹</button>
+      <button class="blog-post-gallery__button" type="button" aria-label="Próxima foto">›</button>
+    `;
+    stage.appendChild(controls);
+  }
+
+  section.appendChild(stage);
+
+  const thumbs = document.createElement("div");
+  thumbs.className = "blog-post-gallery__thumbs";
+  section.appendChild(thumbs);
+
+  let currentIndex = 0;
+
+  function updateGallery(index) {
+    currentIndex = index;
+    stageImage.src = safeImages[index];
+    stageImage.alt = `${title} — foto ${index + 1}`;
+    thumbs.querySelectorAll(".blog-post-gallery__thumb").forEach((thumb, thumbIndex) => {
+      thumb.classList.toggle("is-active", thumbIndex === index);
+    });
+  }
+
+  safeImages.forEach((image, index) => {
+    const thumb = document.createElement("button");
+    thumb.className = `blog-post-gallery__thumb${index === 0 ? " is-active" : ""}`;
+    thumb.type = "button";
+    thumb.setAttribute("aria-label", `Abrir foto ${index + 1}`);
+    thumb.innerHTML = `<img src="${image}" alt="" />`;
+    thumb.addEventListener("click", () => updateGallery(index));
+    thumbs.appendChild(thumb);
+  });
+
+  const [prevButton, nextButton] = section.querySelectorAll(".blog-post-gallery__button");
+  prevButton?.addEventListener("click", () => {
+    updateGallery((currentIndex - 1 + safeImages.length) % safeImages.length);
+  });
+  nextButton?.addEventListener("click", () => {
+    updateGallery((currentIndex + 1) % safeImages.length);
+  });
+
+  return section;
+}
+
 function formatMeta(post) {
   const formattedDate = new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
@@ -243,6 +345,11 @@ function formatMeta(post) {
 }
 
 function getEmbedVideoUrl(url) {
+  const iframeSrcMatch = String(url || "").match(/src=["']([^"']+)["']/i);
+  if (iframeSrcMatch?.[1]) {
+    return iframeSrcMatch[1];
+  }
+
   const youtubeMatch =
     url.match(/youtube\.com\/watch\?v=([^&]+)/) ||
     url.match(/youtu\.be\/([^?&]+)/) ||

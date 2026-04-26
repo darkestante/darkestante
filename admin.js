@@ -2,13 +2,17 @@ import {
   BLOG_ADMIN_EMAIL,
   BLOG_ADMIN_PASSWORD,
   buildBlogPostPayload,
+  clearGitHubPublishToken,
   estimateReadingTime,
   getAllBlogPosts,
   getBlogPostBySlug,
+  getGitHubPublishToken,
   getStoredHeroSlides,
   isBlogAdminAuthenticated,
+  publishBlogPostToGitHub,
   saveBlogPost,
   saveHeroSlides,
+  setGitHubPublishToken,
   setBlogAdminAuthenticated
 } from "./blog-store.js";
 
@@ -21,6 +25,7 @@ const DEFAULT_PREVIEW_DATE = new Intl.DateTimeFormat("pt-BR", {
 const state = {
   editingSlug: "",
   draftCoverImage: "",
+  draftGalleryImages: [],
   currentPanel: "banners"
 };
 
@@ -34,6 +39,7 @@ const elements = {
   blogAdminFeedback: document.querySelector("#blog-admin-feedback"),
   blogCreateNew: document.querySelector("#blog-create-new"),
   blogCancelEdit: document.querySelector("#blog-cancel-edit"),
+  blogPublishLive: document.querySelector("#blog-publish-live"),
   blogPostsList: document.querySelector("#blog-posts-list"),
   blogEditingSlug: document.querySelector("#blog-editing-slug"),
   blogTitle: document.querySelector("#blog-title"),
@@ -44,10 +50,15 @@ const elements = {
   blogTags: document.querySelector("#blog-tags"),
   blogVideoUrl: document.querySelector("#blog-video-url"),
   blogCoverImage: document.querySelector("#blog-cover-image"),
+  blogGalleryImages: document.querySelector("#blog-gallery-images"),
   blogExcerpt: document.querySelector("#blog-excerpt"),
   blogIntro: document.querySelector("#blog-intro"),
   blogBody: document.querySelector("#blog-body"),
   blogFeaturedInput: document.querySelector("#blog-featured"),
+  blogGitHubToken: document.querySelector("#blog-github-token"),
+  blogGitHubSaveToken: document.querySelector("#blog-github-save-token"),
+  blogGitHubClearToken: document.querySelector("#blog-github-clear-token"),
+  blogGitHubStatus: document.querySelector("#blog-github-status"),
   heroSlideInputs: [
     document.querySelector("#hero-slide-1"),
     document.querySelector("#hero-slide-2"),
@@ -65,6 +76,7 @@ const elements = {
   previewMeta: document.querySelector("#blog-preview-meta"),
   previewExcerpt: document.querySelector("#blog-preview-excerpt"),
   previewCover: document.querySelector("#blog-preview-cover"),
+  previewGallery: document.querySelector("#blog-preview-gallery"),
   previewIntro: document.querySelector("#blog-preview-intro"),
   previewBody: document.querySelector("#blog-preview-body"),
   previewTags: document.querySelector("#blog-preview-tags"),
@@ -97,8 +109,12 @@ function bindEvents() {
   elements.blogBody?.addEventListener("input", updateEditorPreview);
   elements.blogFeaturedInput?.addEventListener("change", renderPostsList);
   elements.blogCoverImage?.addEventListener("change", handleCoverImagePreview);
+  elements.blogGalleryImages?.addEventListener("change", handleGalleryImagesPreview);
   elements.blogCreateNew?.addEventListener("click", resetBlogEditor);
   elements.blogCancelEdit?.addEventListener("click", resetBlogEditor);
+  elements.blogPublishLive?.addEventListener("click", handleLivePublish);
+  elements.blogGitHubSaveToken?.addEventListener("click", handleSaveGitHubToken);
+  elements.blogGitHubClearToken?.addEventListener("click", handleClearGitHubToken);
   elements.menuBanners?.addEventListener("click", () => switchAdminPanel("banners"));
   elements.menuBlog?.addEventListener("click", () => switchAdminPanel("blog"));
 }
@@ -113,6 +129,7 @@ function syncAdminVisibility() {
     renderPostsList();
     updateEditorPreview();
     switchAdminPanel(state.currentPanel);
+    syncGitHubTokenState();
   }
 }
 
@@ -204,6 +221,7 @@ function startEditingPost(slug) {
 
   state.editingSlug = post.slug;
   state.draftCoverImage = post.coverImage || "";
+  state.draftGalleryImages = Array.isArray(post.galleryImages) ? [...post.galleryImages] : [];
   if (elements.blogEditingSlug) elements.blogEditingSlug.value = post.slug;
   if (elements.blogTitle) elements.blogTitle.value = post.title || "";
   if (elements.blogCategory) elements.blogCategory.value = post.category || "";
@@ -221,6 +239,7 @@ function startEditingPost(slug) {
   }
   if (elements.blogFeaturedInput) elements.blogFeaturedInput.checked = Boolean(post.featured);
   if (elements.blogCoverImage) elements.blogCoverImage.value = "";
+  if (elements.blogGalleryImages) elements.blogGalleryImages.value = "";
   elements.blogCancelEdit?.classList.remove("hidden");
   switchAdminPanel("blog");
   syncReadingTimeEstimate();
@@ -231,10 +250,14 @@ function startEditingPost(slug) {
 function resetBlogEditor() {
   state.editingSlug = "";
   state.draftCoverImage = "";
+  state.draftGalleryImages = [];
   elements.blogAdminForm?.reset();
   if (elements.blogEditingSlug) elements.blogEditingSlug.value = "";
   if (elements.blogDate) {
     elements.blogDate.value = new Date().toISOString().slice(0, 10);
+  }
+  if (elements.blogGalleryImages) {
+    elements.blogGalleryImages.value = "";
   }
   elements.blogCancelEdit?.classList.add("hidden");
   syncReadingTimeEstimate();
@@ -246,36 +269,14 @@ async function handleBlogPublish(event) {
   event.preventDefault();
 
   try {
-    const selectedCoverImage = await readSelectedImage(elements.blogCoverImage);
-    if (selectedCoverImage) {
-      state.draftCoverImage = selectedCoverImage;
-    }
-
-    const post = buildBlogPostPayload({
-      existingSlug: state.editingSlug,
-      title: elements.blogTitle?.value,
-      category: elements.blogCategory?.value,
-      date: elements.blogDate?.value,
-      readingTime: elements.blogReadingTime?.value,
-      coverLabel: elements.blogCoverLabel?.value,
-      tags: elements.blogTags?.value,
-      videoUrl: elements.blogVideoUrl?.value,
-      coverImage: state.draftCoverImage,
-      excerpt: elements.blogExcerpt?.value,
-      intro: elements.blogIntro?.value,
-      body: elements.blogBody?.value,
-      featured: elements.blogFeaturedInput?.checked
-    });
-
-    if (!post.title || !post.excerpt || !post.intro || !post.body[0]?.paragraphs?.length) {
-      showBlogAdminFeedback("Preencha título, resumo, introdução e texto do artigo.", true);
-      return;
-    }
+    const post = await buildCurrentPostFromForm();
 
     saveBlogPost(post);
     renderPostsList();
     showBlogAdminFeedback(
-      state.editingSlug ? "Artigo atualizado com sucesso neste navegador." : "Artigo publicado neste navegador com sucesso.",
+      state.editingSlug
+        ? "Rascunho atualizado com sucesso neste navegador."
+        : "Rascunho salvo com sucesso neste navegador.",
       false
     );
     state.editingSlug = post.slug;
@@ -285,6 +286,34 @@ async function handleBlogPublish(event) {
   } catch (error) {
     console.error(error);
     showBlogAdminFeedback("Não foi possível salvar o artigo agora.", true);
+  }
+}
+
+async function handleLivePublish() {
+  try {
+    const token = getGitHubPublishToken();
+    if (!token) {
+      showGitHubStatus("Salve um token do GitHub neste navegador antes de publicar no site.", true);
+      return;
+    }
+
+    const post = await buildCurrentPostFromForm();
+    saveBlogPost(post);
+    await publishBlogPostToGitHub(post);
+
+    state.editingSlug = post.slug;
+    if (elements.blogEditingSlug) elements.blogEditingSlug.value = post.slug;
+    elements.blogCancelEdit?.classList.remove("hidden");
+    renderPostsList();
+    updateEditorPreview();
+    showBlogAdminFeedback("Rascunho local salvo com sucesso.", false);
+    showGitHubStatus(
+      "Artigo enviado ao GitHub com sucesso. A Netlify vai atualizar o blog público automaticamente.",
+      false
+    );
+  } catch (error) {
+    console.error(error);
+    showGitHubStatus(error instanceof Error ? error.message : "Não foi possível publicar o artigo no site.", true);
   }
 }
 
@@ -341,11 +370,58 @@ function renderHeroSlidesPreview() {
   elements.heroSlidesPreview.appendChild(fragment);
 }
 
+async function buildCurrentPostFromForm() {
+  const selectedCoverImage = await readSelectedImage(elements.blogCoverImage);
+  const selectedGalleryImages = await readSelectedImages(elements.blogGalleryImages);
+
+  if (selectedCoverImage) {
+    state.draftCoverImage = selectedCoverImage;
+  }
+  if (selectedGalleryImages.length) {
+    state.draftGalleryImages = selectedGalleryImages;
+  }
+
+  const post = buildBlogPostPayload({
+    existingSlug: state.editingSlug,
+    title: elements.blogTitle?.value,
+    category: elements.blogCategory?.value,
+    date: elements.blogDate?.value,
+    readingTime: elements.blogReadingTime?.value,
+    coverLabel: elements.blogCoverLabel?.value,
+    tags: elements.blogTags?.value,
+    videoUrl: elements.blogVideoUrl?.value,
+    coverImage: state.draftCoverImage,
+    galleryImages: state.draftGalleryImages,
+    excerpt: elements.blogExcerpt?.value,
+    intro: elements.blogIntro?.value,
+    body: elements.blogBody?.value,
+    featured: elements.blogFeaturedInput?.checked
+  });
+
+  if (!post.title || !post.excerpt || !post.intro || !post.body[0]?.paragraphs?.length) {
+    throw new Error("Preencha título, resumo, introdução e texto do artigo.");
+  }
+
+  return post;
+}
+
 async function handleCoverImagePreview() {
   try {
     const selectedCoverImage = await readSelectedImage(elements.blogCoverImage);
     if (selectedCoverImage) {
       state.draftCoverImage = selectedCoverImage;
+      updateEditorPreview();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function handleGalleryImagesPreview() {
+  try {
+    const selectedGalleryImages = await readSelectedImages(elements.blogGalleryImages);
+    if (selectedGalleryImages.length) {
+      state.draftGalleryImages = selectedGalleryImages;
       updateEditorPreview();
     }
   } catch (error) {
@@ -371,7 +447,6 @@ function updateEditorPreview() {
   if (elements.previewCategory) elements.previewCategory.textContent = category;
   if (elements.previewTitle) elements.previewTitle.textContent = title;
   if (elements.previewExcerpt) elements.previewExcerpt.textContent = excerpt;
-  if (elements.previewIntro) elements.previewIntro.textContent = intro;
   if (elements.previewMeta) {
     const dateValue = elements.blogDate?.value
       ? new Intl.DateTimeFormat("pt-BR", {
@@ -384,7 +459,9 @@ function updateEditorPreview() {
   }
 
   renderPreviewCover(coverLabel);
+  renderPreviewParagraphs(elements.previewIntro, intro, "A introdução aparecerá aqui.");
   renderPreviewBody(bodyText);
+  renderPreviewGallery(state.draftGalleryImages);
   renderPreviewTags(tags);
   renderPreviewVideo(videoUrl);
 }
@@ -405,23 +482,16 @@ function renderPreviewCover(coverLabel) {
 }
 
 function renderPreviewBody(text) {
-  if (!elements.previewBody) {
-    return;
-  }
-
   const paragraphs = text
     .split(/\n\s*\n/g)
     .map((paragraph) => paragraph.replace(/\n+/g, " ").trim())
     .filter(Boolean);
 
-  if (!paragraphs.length) {
-    elements.previewBody.innerHTML = '<p class="blog-post-section__text">O corpo do artigo aparecerá aqui.</p>';
-    return;
-  }
-
-  elements.previewBody.innerHTML = paragraphs
-    .map((paragraph) => `<p class="blog-post-section__text">${escapeHtml(paragraph)}</p>`)
-    .join("");
+  renderPreviewParagraphs(
+    elements.previewBody,
+    paragraphs.join("\n\n"),
+    "O corpo do artigo aparecerá aqui."
+  );
 }
 
 function renderPreviewTags(tags) {
@@ -459,12 +529,85 @@ function renderPreviewVideo(videoUrl) {
   elements.previewVideoFrame.src = getEmbedVideoUrl(videoUrl);
 }
 
+function renderPreviewGallery(images) {
+  if (!elements.previewGallery) {
+    return;
+  }
+
+  const safeImages = Array.isArray(images) ? images.filter(Boolean) : [];
+  if (!safeImages.length) {
+    elements.previewGallery.classList.add("hidden");
+    elements.previewGallery.innerHTML = "";
+    return;
+  }
+
+  elements.previewGallery.classList.remove("hidden");
+  elements.previewGallery.innerHTML = `
+    <div class="blog-preview-gallery__stage">
+      <img src="${safeImages[0]}" alt="Prévia da galeria do artigo" />
+    </div>
+    <div class="blog-preview-gallery__thumbs">
+      ${safeImages
+        .map(
+          (image, index) =>
+            `<img class="blog-preview-gallery__thumb${index === 0 ? " is-active" : ""}" src="${image}" alt="Miniatura ${index + 1}" />`
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderPreviewParagraphs(container, text, emptyMessage) {
+  if (!container) {
+    return;
+  }
+
+  const paragraphs = String(text || "")
+    .split(/\n\s*\n/g)
+    .map((paragraph) => paragraph.replace(/\n+/g, " ").trim())
+    .filter(Boolean);
+
+  if (!paragraphs.length) {
+    container.innerHTML = `<p class="blog-post-section__text">${escapeHtml(emptyMessage)}</p>`;
+    return;
+  }
+
+  container.innerHTML = paragraphs
+    .map((paragraph) => `<p class="blog-post-section__text">${escapeHtml(paragraph)}</p>`)
+    .join("");
+}
+
 function syncReadingTimeEstimate() {
   if (!elements.blogReadingTime || !elements.blogBody) {
     return;
   }
 
   elements.blogReadingTime.value = estimateReadingTime(elements.blogBody.value);
+}
+
+function handleSaveGitHubToken() {
+  const token = elements.blogGitHubToken?.value.trim() || "";
+  if (!token) {
+    showGitHubStatus("Cole o token do GitHub antes de salvar neste navegador.", true);
+    return;
+  }
+
+  setGitHubPublishToken(token);
+  syncGitHubTokenState();
+  showGitHubStatus("Token do GitHub salvo neste navegador com sucesso.", false);
+}
+
+function handleClearGitHubToken() {
+  clearGitHubPublishToken();
+  syncGitHubTokenState();
+  showGitHubStatus("Token salvo removido deste navegador.", false);
+}
+
+function syncGitHubTokenState() {
+  const token = getGitHubPublishToken();
+  if (elements.blogGitHubToken) {
+    elements.blogGitHubToken.value = token;
+  }
 }
 
 function showBlogAdminFeedback(message, isError) {
@@ -487,6 +630,16 @@ function showHeroSlidesFeedback(message, isError) {
   elements.heroSlidesFeedback.classList.toggle("blog-admin-feedback--error", Boolean(isError));
 }
 
+function showGitHubStatus(message, isError) {
+  if (!elements.blogGitHubStatus) {
+    return;
+  }
+
+  elements.blogGitHubStatus.textContent = message;
+  elements.blogGitHubStatus.classList.toggle("hidden", !message);
+  elements.blogGitHubStatus.classList.toggle("blog-admin-feedback--error", Boolean(isError));
+}
+
 function readSelectedImage(input) {
   const file = input?.files?.[0];
   if (!file) {
@@ -499,6 +652,25 @@ function readSelectedImage(input) {
     reader.onerror = () => reject(new Error("Falha ao ler a imagem"));
     reader.readAsDataURL(file);
   });
+}
+
+function readSelectedImages(input) {
+  const files = Array.from(input?.files || []);
+  if (!files.length) {
+    return Promise.resolve([]);
+  }
+
+  return Promise.all(
+    files.map(
+      (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
+          reader.onerror = () => reject(new Error("Falha ao ler uma das imagens da galeria"));
+          reader.readAsDataURL(file);
+        })
+    )
+  );
 }
 
 function formatAdminPostMeta(post) {
@@ -514,6 +686,11 @@ function formatAdminPostMeta(post) {
 }
 
 function getEmbedVideoUrl(url) {
+  const iframeSrcMatch = String(url || "").match(/src=["']([^"']+)["']/i);
+  if (iframeSrcMatch?.[1]) {
+    return iframeSrcMatch[1];
+  }
+
   const youtubeMatch =
     url.match(/youtube\.com\/watch\?v=([^&]+)/) ||
     url.match(/youtu\.be\/([^?&]+)/) ||
