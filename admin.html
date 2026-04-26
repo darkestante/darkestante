@@ -47,7 +47,19 @@
           </div>
 
           <form id="blog-admin-form" class="blog-admin-form hidden">
-            <section class="blog-admin-subsection" aria-labelledby="blog-admin-slider-title">
+            <div class="blog-admin-toolbar">
+              <nav class="blog-admin-menu" aria-label="Menus do painel">
+                <button id="admin-menu-banners" class="tab-button is-active" type="button">Banners do topo</button>
+                <button id="admin-menu-blog" class="tab-button" type="button">Artigos do blog</button>
+              </nav>
+              <button id="blog-admin-logout" class="detail-button" type="button">Sair do painel</button>
+            </div>
+
+            <section
+              id="admin-panel-banners"
+              class="blog-admin-subsection"
+              aria-labelledby="blog-admin-slider-title"
+            >
               <div class="blog-admin-subsection__head">
                 <div>
                   <p class="eyebrow">Slideshow do topo</p>
@@ -75,6 +87,8 @@
                 </label>
               </div>
 
+              <div id="hero-slides-preview" class="hero-slides-preview"></div>
+
               <div class="blog-admin-form__actions">
                 <button id="hero-slides-save" class="detail-button" type="button">Aplicar imagens no slideshow</button>
               </div>
@@ -82,86 +96,158 @@
               <p id="hero-slides-feedback" class="blog-admin-feedback hidden"></p>
             </section>
 
-            <section class="blog-admin-subsection" aria-labelledby="blog-admin-post-title">
+            <section
+              id="admin-panel-blog"
+              class="blog-admin-subsection blog-admin-subsection--blog hidden"
+              aria-labelledby="blog-admin-post-title"
+            >
               <div class="blog-admin-subsection__head">
                 <div>
-                  <p class="eyebrow">Novo artigo</p>
-                  <h2 id="blog-admin-post-title" class="detail-block__title">Publicar postagem no blog</h2>
+                  <p class="eyebrow">Gerenciador do blog</p>
+                  <h2 id="blog-admin-post-title" class="detail-block__title">Criar, editar e visualizar artigos</h2>
                 </div>
                 <p class="blog-admin-subsection__hint">
-                  Preencha os dados do artigo e publique. O post aparecerá automaticamente
-                  no blog deste navegador com sua própria página interna.
+                  Acompanhe os artigos publicados, abra um post para editar e visualize a prévia com imagem e vídeo antes de salvar.
                 </p>
               </div>
 
-              <div class="blog-admin-form__grid">
-                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
-                  <span class="search-field__label">Título do artigo</span>
-                  <input id="blog-title" type="text" placeholder="Ex.: Minha cobertura da Bienal de Pernambuco" required />
-                </label>
+              <div class="blog-admin-editor">
+                <aside class="blog-admin-posts">
+                  <div class="blog-admin-posts__head">
+                    <div>
+                      <p class="eyebrow">Publicados</p>
+                      <h3 class="detail-block__title">Lista de artigos</h3>
+                    </div>
+                    <button id="blog-create-new" class="detail-button" type="button">Novo artigo</button>
+                  </div>
+                  <div id="blog-posts-list" class="blog-admin-posts__list"></div>
+                </aside>
 
-                <label class="filter-field blog-admin-form__field">
-                  <span class="search-field__label">Categoria</span>
-                  <input id="blog-category" type="text" placeholder="Eventos, Resenha, Editorial..." required />
-                </label>
+                <div class="blog-admin-editor__main">
+                  <input id="blog-editing-slug" type="hidden" />
 
-                <label class="filter-field blog-admin-form__field">
-                  <span class="search-field__label">Data</span>
-                  <input id="blog-date" type="date" required />
-                </label>
+                  <div class="blog-admin-editor__layout">
+                    <div class="blog-admin-editor__form">
+                      <div class="blog-admin-form__grid">
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">Título do artigo</span>
+                          <input id="blog-title" type="text" placeholder="Ex.: Minha cobertura da Bienal de Pernambuco" required />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field">
-                  <span class="search-field__label">Tempo de leitura estimado</span>
-                  <input id="blog-reading-time" type="text" placeholder="Estimado automaticamente" readonly />
-                </label>
+                        <label class="filter-field blog-admin-form__field">
+                          <span class="search-field__label">Categoria</span>
+                          <input id="blog-category" type="text" placeholder="Eventos, Resenha, Editorial..." required />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field">
-                  <span class="search-field__label">Texto da capa editorial</span>
-                  <input id="blog-cover-label" type="text" placeholder="Ex.: Eventos" />
-                </label>
+                        <label class="filter-field blog-admin-form__field">
+                          <span class="search-field__label">Data</span>
+                          <input id="blog-date" type="date" required />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field">
-                  <span class="search-field__label">Tags</span>
-                  <input id="blog-tags" type="text" placeholder="terror, bienal, cobertura" />
-                </label>
+                        <label class="filter-field blog-admin-form__field">
+                          <span class="search-field__label">Tempo de leitura estimado</span>
+                          <input id="blog-reading-time" type="text" placeholder="Estimado automaticamente" readonly />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
-                  <span class="search-field__label">URL do vídeo</span>
-                  <input id="blog-video-url" type="url" placeholder="Link do YouTube ou Vimeo (opcional)" />
-                </label>
+                        <label class="filter-field blog-admin-form__field">
+                          <span class="search-field__label">Texto da capa editorial</span>
+                          <input id="blog-cover-label" type="text" placeholder="Ex.: Eventos" />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
-                  <span class="search-field__label">Imagem de capa</span>
-                  <input id="blog-cover-image" type="file" accept="image/*" />
-                </label>
+                        <label class="filter-field blog-admin-form__field">
+                          <span class="search-field__label">Tags</span>
+                          <input id="blog-tags" type="text" placeholder="terror, bienal, cobertura" />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
-                  <span class="search-field__label">Resumo curto</span>
-                  <textarea id="blog-excerpt" rows="3" placeholder="Resumo que aparece nos cards do blog." required></textarea>
-                </label>
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">URL do vídeo</span>
+                          <input id="blog-video-url" type="url" placeholder="Link do YouTube (opcional)" />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
-                  <span class="search-field__label">Introdução</span>
-                  <textarea id="blog-intro" rows="4" placeholder="Texto de abertura do artigo." required></textarea>
-                </label>
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">Imagem de capa</span>
+                          <input id="blog-cover-image" type="file" accept="image/*" />
+                        </label>
 
-                <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
-                  <span class="search-field__label">Texto do artigo</span>
-                  <textarea id="blog-body" rows="10" placeholder="Escreva o artigo aqui. Separe parágrafos com uma linha em branco." required></textarea>
-                </label>
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">Resumo curto</span>
+                          <textarea id="blog-excerpt" rows="3" placeholder="Resumo que aparece nos cards do blog." required></textarea>
+                        </label>
+
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">Introdução</span>
+                          <textarea id="blog-intro" rows="4" placeholder="Texto de abertura do artigo." required></textarea>
+                        </label>
+
+                        <label class="filter-field blog-admin-form__field blog-admin-form__field--wide">
+                          <span class="search-field__label">Texto do artigo</span>
+                          <textarea id="blog-body" rows="10" placeholder="Escreva o artigo aqui. Separe parágrafos com uma linha em branco." required></textarea>
+                        </label>
+                      </div>
+
+                      <label class="blog-admin-form__checkbox">
+                        <input id="blog-featured" type="checkbox" />
+                        <span>Destacar este artigo no topo do blog</span>
+                      </label>
+
+                      <div class="blog-admin-form__actions">
+                        <button id="blog-save" class="detail-button detail-button--accent" type="submit">Salvar artigo</button>
+                        <button id="blog-cancel-edit" class="detail-button hidden" type="button">Cancelar edição</button>
+                      </div>
+
+                      <p id="blog-admin-feedback" class="blog-admin-feedback hidden"></p>
+                    </div>
+
+                    <aside class="blog-admin-preview">
+                      <div class="blog-admin-preview__head">
+                        <p class="eyebrow">Prévia interna</p>
+                        <h3 class="detail-block__title">Como o artigo está ficando</h3>
+                      </div>
+
+                      <article class="blog-preview-card">
+                        <div id="blog-preview-cover" class="blog-post-cover blog-post-cover--editorial">
+                          <span>Editorial</span>
+                        </div>
+                        <div class="blog-preview-card__body">
+                          <p id="blog-preview-category" class="blog-card__eyebrow">Editorial</p>
+                          <h3 id="blog-preview-title" class="blog-card__title">Título do artigo</h3>
+                          <p id="blog-preview-meta" class="blog-card__meta">Data • 1 min de leitura</p>
+                          <p id="blog-preview-excerpt" class="detail-copy">O resumo aparecerá aqui conforme você preencher o artigo.</p>
+                        </div>
+                      </article>
+
+                      <div id="blog-preview-video" class="blog-post-video hidden">
+                        <h4 class="blog-post-section__title">Vídeo do artigo</h4>
+                        <div class="blog-post-video__frame">
+                          <iframe
+                            id="blog-preview-video-frame"
+                            src=""
+                            title="Prévia do vídeo"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen
+                          ></iframe>
+                        </div>
+                      </div>
+
+                      <div class="blog-preview-content">
+                        <section class="blog-post-section">
+                          <h4 class="blog-post-section__title">Introdução</h4>
+                          <p id="blog-preview-intro" class="blog-post-section__text">
+                            A introdução aparecerá aqui.
+                          </p>
+                        </section>
+                        <section class="blog-post-section">
+                          <h4 class="blog-post-section__title">Corpo do artigo</h4>
+                          <div id="blog-preview-body" class="blog-preview-body"></div>
+                        </section>
+                        <div id="blog-preview-tags" class="blog-post-tags"></div>
+                      </div>
+                    </aside>
+                  </div>
+                </div>
               </div>
-
-              <label class="blog-admin-form__checkbox">
-                <input id="blog-featured" type="checkbox" />
-                <span>Destacar este artigo no topo do blog</span>
-              </label>
-
-              <div class="blog-admin-form__actions">
-                <button class="detail-button detail-button--accent" type="submit">Publicar artigo</button>
-                <button id="blog-admin-logout" class="detail-button" type="button">Sair do painel</button>
-              </div>
-
-              <p id="blog-admin-feedback" class="blog-admin-feedback hidden"></p>
             </section>
           </form>
         </section>

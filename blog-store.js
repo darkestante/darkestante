@@ -9,7 +9,17 @@ export const BLOG_ADMIN_EMAIL = "darkestante@gmail.com";
 export const BLOG_ADMIN_PASSWORD = "@Bc86022389";
 
 export function getAllBlogPosts() {
-  return [...BLOG_POSTS, ...getStoredBlogPosts()];
+  const merged = new Map();
+
+  BLOG_POSTS.forEach((post) => {
+    merged.set(post.slug, structuredCloneSafe(post));
+  });
+
+  getStoredBlogPosts().forEach((post) => {
+    merged.set(post.slug, structuredCloneSafe(post));
+  });
+
+  return [...merged.values()].sort(sortBlogPosts);
 }
 
 export function getStoredBlogPosts() {
@@ -40,6 +50,10 @@ export function saveBlogPost(post) {
   window.localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(existing));
 }
 
+export function getBlogPostBySlug(slug) {
+  return getAllBlogPosts().find((post) => post.slug === slug) || null;
+}
+
 export function isBlogAdminAuthenticated() {
   if (typeof window === "undefined") {
     return false;
@@ -62,6 +76,7 @@ export function buildBlogPostPayload(fields) {
   const excerpt = String(fields.excerpt || "").trim();
   const intro = String(fields.intro || "").trim();
   const bodyText = String(fields.body || "").trim();
+  const existingSlug = String(fields.existingSlug || "").trim();
 
   const paragraphs = bodyText
     .split(/\n\s*\n/g)
@@ -69,7 +84,7 @@ export function buildBlogPostPayload(fields) {
     .filter(Boolean);
 
   return {
-    slug: slugify(title),
+    slug: existingSlug || slugify(title),
     title,
     category,
     date: String(fields.date || "").trim(),
@@ -90,7 +105,8 @@ export function buildBlogPostPayload(fields) {
         heading: "",
         paragraphs
       }
-    ]
+    ],
+    updatedAt: new Date().toISOString()
   };
 }
 
@@ -165,4 +181,18 @@ export function savePostComment(slug, comment) {
   const current = Array.isArray(parsed[slug]) ? parsed[slug] : [];
   parsed[slug] = [comment, ...current];
   window.localStorage.setItem(BLOG_COMMENTS_STORAGE_KEY, JSON.stringify(parsed));
+}
+
+function sortBlogPosts(a, b) {
+  if (Boolean(a.featured) !== Boolean(b.featured)) {
+    return a.featured ? -1 : 1;
+  }
+
+  const dateA = Date.parse(`${a.date || "1970-01-01"}T12:00:00`);
+  const dateB = Date.parse(`${b.date || "1970-01-01"}T12:00:00`);
+  return dateB - dateA;
+}
+
+function structuredCloneSafe(value) {
+  return JSON.parse(JSON.stringify(value));
 }
