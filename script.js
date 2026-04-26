@@ -481,7 +481,7 @@ function formatBlogPostMeta(post) {
 }
 
 function getBlogPostUrl(slug) {
-  return `blog/${slug}/`;
+  return `/blog/${slug}/`;
 }
 
 function comparePostsByDate(left, right) {

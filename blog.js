@@ -121,10 +121,10 @@ function getBlogIndexUrl() {
   const segments = window.location.pathname.split("/").filter(Boolean);
   const blogIndex = segments.lastIndexOf("blog");
   if (blogIndex >= 0 && segments[blogIndex + 1]) {
-    return "../";
+    return "/blog/";
   }
 
-  return "blog/";
+  return "/blog/";
 }
 
 function renderShareButtons(post) {
