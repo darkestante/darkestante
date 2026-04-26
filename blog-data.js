@@ -25,7 +25,7 @@ export const BLOG_POSTS = [
         ]
       }
     ],
-    "updatedAt": "2026-04-26T02:14:19.835Z"
+    "updatedAt": "2026-04-26T02:34:23.199Z"
   },
   {
     "slug": "boas-vindas-ao-blog-darkestante",
