@@ -88,8 +88,8 @@ select {
 
 .hero-slider {
   position: relative;
-  aspect-ratio: 2048 / 329;
-  min-height: 0;
+  aspect-ratio: 2048 / 430;
+  min-height: clamp(260px, 24vw, 430px);
   background: transparent;
 }
 
@@ -113,7 +113,7 @@ select {
 .hero-slide::before {
   background-image: var(--hero-image);
   background-position: var(--hero-position, center);
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   filter: none;
 }
@@ -164,16 +164,18 @@ select {
 
 .hero-slider__controls {
   position: absolute;
-  right: 24px;
-  bottom: 22px;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
   z-index: 2;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: rgba(12, 12, 14, 0.42);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(12, 12, 14, 0.22);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
 }
 
 .hero-slider__arrow,
@@ -188,8 +190,9 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   font-size: 1.55rem;
   line-height: 1;
   transition: background 180ms ease, color 180ms ease;
@@ -204,12 +207,12 @@ select {
 .hero-slider__dots {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .hero-slider__dot {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.42);
   transition: transform 180ms ease, background 180ms ease;
@@ -2635,27 +2638,17 @@ select {
   }
 
   .hero-slider {
-    min-height: 240px;
-  }
-
-  .hero-slide {
-    padding: 20px 18px 62px;
-  }
-
-  .hero-slide__title {
-    font-size: clamp(1.35rem, 8vw, 2.1rem);
-  }
-
-  .hero-slide__text {
-    font-size: 0.88rem;
-    line-height: 1.6;
+    min-height: 220px;
   }
 
   .hero-slider__controls {
-    right: 14px;
-    left: 14px;
-    bottom: 12px;
-    justify-content: space-between;
+    left: 50%;
+    right: auto;
+    bottom: 10px;
+    transform: translateX(-50%);
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 12px;
   }
 
   .hero-meta-bar__socials {
