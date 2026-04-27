@@ -49,8 +49,8 @@
           <form id="blog-admin-form" class="blog-admin-form hidden">
             <div class="blog-admin-toolbar">
               <nav class="blog-admin-menu" aria-label="Menus do painel">
-                <button id="admin-menu-banners" class="tab-button is-active" type="button">Banners do topo</button>
-                <button id="admin-menu-blog" class="tab-button" type="button">Artigos do blog</button>
+                <button id="admin-menu-banners" class="tab-button is-active" type="button">Carrossel</button>
+                <button id="admin-menu-blog" class="tab-button" type="button">Blog</button>
               </nav>
               <button id="blog-admin-logout" class="detail-button" type="button">Sair do painel</button>
             </div>
@@ -63,7 +63,7 @@
               <div class="blog-admin-subsection__head">
                 <div>
                   <p class="eyebrow">Slideshow do topo</p>
-                  <h2 id="blog-admin-slider-title" class="detail-block__title">Atualizar as 3 faces do banner</h2>
+                  <h2 id="blog-admin-slider-title" class="detail-block__title">Gerenciar banners do carrossel</h2>
                 </div>
                 <p class="blog-admin-subsection__hint">
                   Dimensão recomendada: 1920 x 430 px. Use imagens horizontais nessa proporção para encaixar melhor no topo do site.
@@ -104,10 +104,10 @@
               <div class="blog-admin-subsection__head">
                 <div>
                   <p class="eyebrow">Gerenciador do blog</p>
-                  <h2 id="blog-admin-post-title" class="detail-block__title">Criar, editar e visualizar artigos</h2>
+                  <h2 id="blog-admin-post-title" class="detail-block__title">Postar e gerenciar artigos</h2>
                 </div>
                 <p class="blog-admin-subsection__hint">
-                  Acompanhe os artigos publicados, abra um post para editar e visualize a prévia com imagem e vídeo antes de salvar.
+                  Pesquise artigos publicados, abra posts antigos para editar e visualize a prévia com imagens e vídeo antes de publicar.
                 </p>
               </div>
 
@@ -116,10 +116,18 @@
                   <div class="blog-admin-posts__head">
                     <div>
                       <p class="eyebrow">Publicados</p>
-                      <h3 class="detail-block__title">Lista de artigos</h3>
+                      <h3 class="detail-block__title">Artigos publicados</h3>
                     </div>
                     <button id="blog-create-new" class="detail-button" type="button">Novo artigo</button>
                   </div>
+                  <label class="filter-field blog-admin-posts__search">
+                    <span class="search-field__label">Pesquisar</span>
+                    <input
+                      id="blog-post-search"
+                      type="search"
+                      placeholder="Título, tema, tag ou palavra-chave"
+                    />
+                  </label>
                   <div id="blog-posts-list" class="blog-admin-posts__list"></div>
                 </aside>
 

@@ -532,7 +532,8 @@ function formatBlogPostMeta(post) {
 }
 
 function getBlogPostUrl(slug) {
-  return `/blog/${slug}/`;
+  const safeSlug = String(slug || "").replace(/^\/+|\/+$/g, "");
+  return safeSlug ? `/blog/${safeSlug}/` : "/blog/";
 }
 
 function comparePostsByDate(left, right) {

@@ -41,6 +41,7 @@ const elements = {
   blogCancelEdit: document.querySelector("#blog-cancel-edit"),
   blogPublishLive: document.querySelector("#blog-publish-live"),
   blogPostsList: document.querySelector("#blog-posts-list"),
+  blogPostSearch: document.querySelector("#blog-post-search"),
   blogEditingSlug: document.querySelector("#blog-editing-slug"),
   blogTitle: document.querySelector("#blog-title"),
   blogCategory: document.querySelector("#blog-category"),
@@ -108,6 +109,7 @@ function bindEvents() {
   elements.blogIntro?.addEventListener("input", updateEditorPreview);
   elements.blogBody?.addEventListener("input", updateEditorPreview);
   elements.blogFeaturedInput?.addEventListener("change", renderPostsList);
+  elements.blogPostSearch?.addEventListener("input", renderPostsList);
   elements.blogCoverImage?.addEventListener("change", handleCoverImagePreview);
   elements.blogGalleryImages?.addEventListener("change", handleGalleryImagesPreview);
   elements.blogCreateNew?.addEventListener("click", resetBlogEditor);
@@ -177,12 +179,17 @@ function renderPostsList() {
     return;
   }
 
-  const posts = getAllBlogPosts();
+  const query = normalizeSearch(elements.blogPostSearch?.value || "");
+  const allPosts = getAllBlogPosts();
+  const posts = query
+    ? allPosts.filter((post) => normalizeSearch(getPostSearchText(post)).includes(query))
+    : allPosts;
   elements.blogPostsList.innerHTML = "";
 
   if (!posts.length) {
-    elements.blogPostsList.innerHTML =
-      '<p class="blog-admin-posts__empty">Nenhum artigo publicado ainda neste navegador.</p>';
+    elements.blogPostsList.innerHTML = query
+      ? '<p class="blog-admin-posts__empty">Nenhum artigo encontrado para essa busca.</p>'
+      : '<p class="blog-admin-posts__empty">Nenhum artigo publicado ainda.</p>';
     return;
   }
 
@@ -210,6 +217,35 @@ function renderPostsList() {
   elements.blogPostsList.querySelectorAll("[data-edit-post]").forEach((button) => {
     button.addEventListener("click", () => startEditingPost(button.getAttribute("data-edit-post") || ""));
   });
+}
+
+function getPostSearchText(post) {
+  const tags = Array.isArray(post.tags) ? post.tags.join(" ") : "";
+  const body = Array.isArray(post.body)
+    ? post.body
+        .flatMap((section) => [section.heading, ...(section.paragraphs || [])])
+        .join(" ")
+    : "";
+
+  return [
+    post.title,
+    post.category,
+    post.excerpt,
+    post.intro,
+    post.slug,
+    tags,
+    body
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function normalizeSearch(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 function startEditingPost(slug) {

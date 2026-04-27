@@ -1159,6 +1159,11 @@ select {
   gap: 10px;
 }
 
+.blog-admin-posts__search,
+.blog-admin-posts__search input {
+  width: 100%;
+}
+
 .blog-admin-posts__empty {
   margin: 0;
   color: var(--muted);

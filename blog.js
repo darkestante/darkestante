@@ -103,7 +103,7 @@ function renderPost(post) {
 
 function getCurrentBlogSlug() {
   const params = new URLSearchParams(window.location.search);
-  const querySlug = params.get("slug");
+  const querySlug = params.get("slug") || params.get("post");
   if (querySlug) {
     return querySlug;
   }
