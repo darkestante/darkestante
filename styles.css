@@ -361,6 +361,17 @@ select {
   border-color: rgba(240, 90, 63, 0.22);
 }
 
+.detail-button--danger {
+  border-color: rgba(165, 47, 47, 0.2);
+  background: linear-gradient(135deg, rgba(165, 47, 47, 0.12), rgba(165, 47, 47, 0.04));
+  color: #8e2f2f;
+}
+
+.detail-button--danger:hover {
+  background: linear-gradient(135deg, rgba(165, 47, 47, 0.18), rgba(165, 47, 47, 0.08));
+  color: #762323;
+}
+
 .home-layout,
 .detail-layout {
   display: grid;
@@ -1185,8 +1196,7 @@ select {
 }
 
 .blog-admin-post__meta {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8px;
   color: var(--muted);
   font-size: 0.84rem;
@@ -1259,6 +1269,13 @@ select {
 .blog-preview-content {
   display: grid;
   gap: 16px;
+}
+
+.blog-preview-author {
+  margin: -4px 0 0;
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .blog-preview-body,

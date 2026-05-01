@@ -3,6 +3,8 @@ import {
   BLOG_ADMIN_PASSWORD,
   buildBlogPostPayload,
   clearGitHubPublishToken,
+  deleteBlogPost,
+  deleteBlogPostFromGitHub,
   estimateReadingTime,
   getAllBlogPosts,
   getBlogPostBySlug,
@@ -46,6 +48,7 @@ const elements = {
   blogTitle: document.querySelector("#blog-title"),
   blogCategory: document.querySelector("#blog-category"),
   blogDate: document.querySelector("#blog-date"),
+  blogAuthor: document.querySelector("#blog-author"),
   blogReadingTime: document.querySelector("#blog-reading-time"),
   blogCoverLabel: document.querySelector("#blog-cover-label"),
   blogTags: document.querySelector("#blog-tags"),
@@ -75,6 +78,7 @@ const elements = {
   previewCategory: document.querySelector("#blog-preview-category"),
   previewTitle: document.querySelector("#blog-preview-title"),
   previewMeta: document.querySelector("#blog-preview-meta"),
+  previewAuthor: document.querySelector("#blog-preview-author"),
   previewExcerpt: document.querySelector("#blog-preview-excerpt"),
   previewCover: document.querySelector("#blog-preview-cover"),
   previewGallery: document.querySelector("#blog-preview-gallery"),
@@ -102,6 +106,7 @@ function bindEvents() {
   elements.blogTitle?.addEventListener("input", updateEditorPreview);
   elements.blogCategory?.addEventListener("input", updateEditorPreview);
   elements.blogDate?.addEventListener("input", updateEditorPreview);
+  elements.blogAuthor?.addEventListener("input", updateEditorPreview);
   elements.blogCoverLabel?.addEventListener("input", updateEditorPreview);
   elements.blogTags?.addEventListener("input", updateEditorPreview);
   elements.blogVideoUrl?.addEventListener("input", updateEditorPreview);
@@ -207,6 +212,7 @@ function renderPostsList() {
       <div class="blog-admin-post__actions">
         ${post.featured ? '<span class="blog-admin-post__badge">Destaque</span>' : ""}
         <button class="detail-button" type="button" data-edit-post="${escapeHtml(post.slug)}">Editar</button>
+        <button class="detail-button detail-button--danger" type="button" data-delete-post="${escapeHtml(post.slug)}">Excluir</button>
       </div>
     `;
     fragment.appendChild(item);
@@ -216,6 +222,10 @@ function renderPostsList() {
 
   elements.blogPostsList.querySelectorAll("[data-edit-post]").forEach((button) => {
     button.addEventListener("click", () => startEditingPost(button.getAttribute("data-edit-post") || ""));
+  });
+
+  elements.blogPostsList.querySelectorAll("[data-delete-post]").forEach((button) => {
+    button.addEventListener("click", () => handleDeletePost(button.getAttribute("data-delete-post") || ""));
   });
 }
 
@@ -230,6 +240,7 @@ function getPostSearchText(post) {
   return [
     post.title,
     post.category,
+    post.author,
     post.excerpt,
     post.intro,
     post.slug,
@@ -262,6 +273,7 @@ function startEditingPost(slug) {
   if (elements.blogTitle) elements.blogTitle.value = post.title || "";
   if (elements.blogCategory) elements.blogCategory.value = post.category || "";
   if (elements.blogDate) elements.blogDate.value = post.date || "";
+  if (elements.blogAuthor) elements.blogAuthor.value = post.author || "";
   if (elements.blogReadingTime) elements.blogReadingTime.value = post.readingTime || "";
   if (elements.blogCoverLabel) elements.blogCoverLabel.value = post.coverLabel || "";
   if (elements.blogTags) elements.blogTags.value = Array.isArray(post.tags) ? post.tags.join(", ") : "";
@@ -322,6 +334,48 @@ async function handleBlogPublish(event) {
   } catch (error) {
     console.error(error);
     showBlogAdminFeedback("Não foi possível salvar o artigo agora.", true);
+  }
+}
+
+async function handleDeletePost(slug) {
+  const post = getBlogPostBySlug(slug);
+  if (!post) {
+    showBlogAdminFeedback("Não foi possível localizar esse artigo para exclusão.", true);
+    return;
+  }
+
+  const confirmed = window.confirm(`Deseja excluir o artigo "${post.title}"?`);
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    const token = getGitHubPublishToken();
+
+    if (token) {
+      await deleteBlogPostFromGitHub(slug);
+    }
+
+    deleteBlogPost(slug);
+
+    if (state.editingSlug === slug) {
+      resetBlogEditor();
+    }
+
+    renderPostsList();
+    updateEditorPreview();
+    showBlogAdminFeedback(
+      token
+        ? "Artigo removido da lista local e do blog público com sucesso."
+        : "Artigo removido apenas deste navegador. Para excluir do site também, salve um token do GitHub.",
+      false
+    );
+  } catch (error) {
+    console.error(error);
+    showBlogAdminFeedback(
+      error instanceof Error ? error.message : "Não foi possível excluir o artigo agora.",
+      true
+    );
   }
 }
 
@@ -422,6 +476,7 @@ async function buildCurrentPostFromForm() {
     title: elements.blogTitle?.value,
     category: elements.blogCategory?.value,
     date: elements.blogDate?.value,
+    author: elements.blogAuthor?.value,
     readingTime: elements.blogReadingTime?.value,
     coverLabel: elements.blogCoverLabel?.value,
     tags: elements.blogTags?.value,
@@ -470,6 +525,7 @@ function updateEditorPreview() {
   const category = elements.blogCategory?.value.trim() || "Editorial";
   const excerpt = elements.blogExcerpt?.value.trim() || "O resumo aparecerá aqui conforme você preencher o artigo.";
   const intro = elements.blogIntro?.value.trim() || "A introdução aparecerá aqui.";
+  const author = elements.blogAuthor?.value.trim() || "";
   const coverLabel = elements.blogCoverLabel?.value.trim() || category;
   const bodyText = elements.blogBody?.value.trim() || "";
   const tags = String(elements.blogTags?.value || "")
@@ -492,6 +548,10 @@ function updateEditorPreview() {
         }).format(new Date(`${elements.blogDate.value}T12:00:00`))
       : DEFAULT_PREVIEW_DATE;
     elements.previewMeta.textContent = `${dateValue} • ${elements.blogReadingTime?.value || "1 min de leitura"}`;
+  }
+  if (elements.previewAuthor) {
+    elements.previewAuthor.textContent = author ? `Por ${author}` : "";
+    elements.previewAuthor.classList.toggle("hidden", !author);
   }
 
   renderPreviewCover(coverLabel);
@@ -718,7 +778,11 @@ function formatAdminPostMeta(post) {
       }).format(new Date(`${post.date}T12:00:00`))
     : "Sem data";
 
-  return `${formattedDate} • ${post.readingTime || "1 min de leitura"}`;
+  const details = [formattedDate, post.readingTime || "1 min de leitura"];
+  if (post.author) {
+    details.push(`Por ${post.author}`);
+  }
+  return details.join(" • ");
 }
 
 function getEmbedVideoUrl(url) {

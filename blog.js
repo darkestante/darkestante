@@ -4,6 +4,7 @@ const elements = {
   title: document.querySelector("#blog-post-title"),
   category: document.querySelector("#blog-post-category"),
   meta: document.querySelector("#blog-post-meta"),
+  author: document.querySelector("#blog-post-author"),
   excerpt: document.querySelector("#blog-post-excerpt"),
   cover: document.querySelector("#blog-post-cover"),
   content: document.querySelector("#blog-post-content"),
@@ -40,6 +41,10 @@ function renderPost(post) {
   elements.title.textContent = post.title;
   elements.category.textContent = post.category;
   elements.meta.textContent = formatMeta(post);
+  if (elements.author) {
+    elements.author.textContent = post.author ? `Por ${post.author}` : "";
+    elements.author.classList.toggle("hidden", !post.author);
+  }
   elements.excerpt.textContent = post.excerpt;
   renderCover(post);
 
@@ -142,6 +147,18 @@ function renderShareButtons(post) {
     <a class="detail-button" href="https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}" target="_blank" rel="noreferrer">X</a>
     <a class="detail-button" href="https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}" target="_blank" rel="noreferrer">LinkedIn</a>
   `;
+}
+
+function formatMeta(post) {
+  const formattedDate = post.date
+    ? new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }).format(new Date(`${post.date}T12:00:00`))
+    : "";
+
+  return [formattedDate, post.readingTime].filter(Boolean).join(" • ");
 }
 
 function renderComments(slug) {

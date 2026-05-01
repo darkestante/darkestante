@@ -55,6 +55,15 @@ export function saveBlogPost(post) {
   window.localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(existing));
 }
 
+export function deleteBlogPost(slug) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const nextPosts = getStoredBlogPosts().filter((entry) => entry.slug !== slug);
+  window.localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(nextPosts));
+}
+
 export function getGitHubPublishToken() {
   if (typeof window === "undefined") {
     return "";
@@ -112,6 +121,7 @@ export function buildBlogPostPayload(fields) {
   const intro = String(fields.intro || "").trim();
   const bodyText = String(fields.body || "").trim();
   const existingSlug = String(fields.existingSlug || "").trim();
+  const author = String(fields.author || "").trim();
 
   const paragraphs = bodyText
     .split(/\n\s*\n/g)
@@ -122,6 +132,7 @@ export function buildBlogPostPayload(fields) {
     slug: existingSlug || slugify(title),
     title,
     category,
+    author,
     date: String(fields.date || "").trim(),
     readingTime: estimateReadingTime(bodyText, String(fields.readingTime || "").trim()),
     featured: Boolean(fields.featured),
@@ -230,6 +241,15 @@ export async function publishBlogPostToGitHub(post) {
   return publishBlogPostToGitHubAttempt(post, token, 0);
 }
 
+export async function deleteBlogPostFromGitHub(slug) {
+  const token = getGitHubPublishToken();
+  if (!token) {
+    throw new Error("Salve um token do GitHub neste navegador antes de excluir do site.");
+  }
+
+  return deleteBlogPostFromGitHubAttempt(slug, token, 0);
+}
+
 async function publishBlogPostToGitHubAttempt(post, token, attempt) {
   const endpoint = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_BLOG_DATA_PATH}?ref=${GITHUB_BRANCH}`;
   const currentFileResponse = await fetch(endpoint, {
@@ -277,6 +297,61 @@ async function publishBlogPostToGitHubAttempt(post, token, attempt) {
       (message.includes("does not match") || message.includes("sha"))
     ) {
       return publishBlogPostToGitHubAttempt(post, token, attempt + 1);
+    }
+
+    throw new Error(message);
+  }
+
+  return updateResponse.json();
+}
+
+async function deleteBlogPostFromGitHubAttempt(slug, token, attempt) {
+  const endpoint = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_BLOG_DATA_PATH}?ref=${GITHUB_BRANCH}`;
+  const currentFileResponse = await fetch(endpoint, {
+    cache: "no-store",
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28"
+    }
+  });
+
+  if (!currentFileResponse.ok) {
+    const details = await safeReadJson(currentFileResponse);
+    throw new Error(details?.message || "Não foi possível ler o arquivo do blog no GitHub.");
+  }
+
+  const currentFile = await currentFileResponse.json();
+  const posts = parseBlogPostsModule(currentFile.content);
+  const nextPosts = posts.filter((post) => post.slug !== slug).sort(sortBlogPosts);
+  const nextContent = formatBlogDataModule(nextPosts);
+
+  const updateResponse = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_BLOG_DATA_PATH}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    },
+    body: JSON.stringify({
+      message: `Remove artigo: ${slug}`,
+      content: encodeBase64Utf8(nextContent),
+      sha: currentFile.sha,
+      branch: GITHUB_BRANCH
+    })
+  });
+
+  if (!updateResponse.ok) {
+    const details = await safeReadJson(updateResponse);
+    const message = details?.message || "Não foi possível excluir o artigo no GitHub.";
+
+    if (
+      attempt < 1 &&
+      typeof message === "string" &&
+      (message.includes("does not match") || message.includes("sha"))
+    ) {
+      return deleteBlogPostFromGitHubAttempt(slug, token, attempt + 1);
     }
 
     throw new Error(message);
