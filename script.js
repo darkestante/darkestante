@@ -1,5 +1,6 @@
 import { FALLBACK_AUTHOR, FALLBACK_COVER, fetchBooks, normalizeText } from "./data.js";
 import { getAllBlogPosts, getStoredHeroSlides } from "./blog-store.js";
+import { syncSiteAuthUi } from "./auth-ui.js";
 
 const elements = {
   booksGrid: document.querySelector("#books-grid"),
@@ -89,6 +90,7 @@ const REVIEW_VIDEOS = [
 init();
 
 async function init() {
+  syncSiteAuthUi();
   bindEvents();
   applyStoredHeroSlides();
   initHeroSlider();

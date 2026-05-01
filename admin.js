@@ -17,6 +17,7 @@ import {
   setGitHubPublishToken,
   setBlogAdminAuthenticated
 } from "./blog-store.js";
+import { syncSiteAuthUi } from "./auth-ui.js";
 
 const DEFAULT_PREVIEW_DATE = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
@@ -92,6 +93,7 @@ const elements = {
 init();
 
 function init() {
+  syncSiteAuthUi();
   bindEvents();
   syncAdminVisibility();
   renderHeroSlidesPreview();

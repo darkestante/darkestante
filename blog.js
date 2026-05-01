@@ -1,4 +1,5 @@
 import { getAllBlogPosts, getPostComments, savePostComment } from "./blog-store.js";
+import { syncSiteAuthUi } from "./auth-ui.js";
 
 const elements = {
   title: document.querySelector("#blog-post-title"),
@@ -23,6 +24,7 @@ const elements = {
 init();
 
 function init() {
+  syncSiteAuthUi();
   const slug = getCurrentBlogSlug();
   const posts = getAllBlogPosts();
   const post = posts.find((entry) => entry.slug === slug);
