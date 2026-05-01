@@ -24,9 +24,9 @@ init();
 function init() {
   const slug = getCurrentBlogSlug();
   const posts = getAllBlogPosts();
-  const post = posts.find((entry) => entry.slug === slug) || posts[0];
+  const post = posts.find((entry) => entry.slug === slug);
 
-  if (!post) {
+  if (!slug || !post) {
     elements.loadingState.classList.add("hidden");
     elements.errorState.classList.remove("hidden");
     return;
@@ -132,7 +132,7 @@ function renderShareButtons(post) {
     return;
   }
 
-  const shareUrl = new URL(window.location.href);
+  const shareUrl = new URL(`/blog/${post.slug}/`, window.location.origin);
   const encodedUrl = encodeURIComponent(shareUrl.href);
   const encodedTitle = encodeURIComponent(post.title);
 
