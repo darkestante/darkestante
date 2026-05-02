@@ -26,7 +26,7 @@ export const BLOG_POSTS = [
         ]
       }
     ],
-    "updatedAt": "2026-05-02T00:27:27.452Z"
+    "updatedAt": "2026-05-02T00:27:29.147Z"
   },
   {
     "slug": "eventos-literarios-no-darkestante",
