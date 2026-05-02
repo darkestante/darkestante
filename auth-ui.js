@@ -3,6 +3,7 @@ import { isBlogAdminAuthenticated, setBlogAdminAuthenticated } from "./blog-stor
 export function syncSiteAuthUi() {
   syncAuthLinks();
   syncHomeLinks();
+  syncAdminLinks();
 }
 
 function syncAuthLinks() {
@@ -36,5 +37,17 @@ function syncHomeLinks() {
   homeLinks.forEach((link) => {
     const fallback = link.getAttribute("data-home-fallback") || link.getAttribute("href") || "index.html";
     link.setAttribute("href", isLocalFile ? fallback : "/");
+  });
+}
+
+function syncAdminLinks() {
+  const adminLinks = document.querySelectorAll("[data-admin-link]");
+  const isAuthenticated = isBlogAdminAuthenticated();
+  const isLocalFile = window.location.protocol === "file:";
+
+  adminLinks.forEach((link) => {
+    const fallback = link.getAttribute("data-admin-fallback") || "login/index.html";
+    link.setAttribute("href", isLocalFile ? fallback : "/login/");
+    link.classList.toggle("hidden", !isAuthenticated);
   });
 }

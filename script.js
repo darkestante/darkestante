@@ -912,7 +912,4 @@ function monthOrder(month) {
     "setembro",
     "outubro",
     "novembro",
-    "dezembro"
-  ];
-  return months.indexOf(normalizeText(month));
-}
+  

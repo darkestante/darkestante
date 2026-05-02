@@ -355,28 +355,4 @@ function renderGallerySection(images, title) {
 
 function formatMeta(post) {
   const formattedDate = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  }).format(new Date(`${post.date}T12:00:00`));
-
-  return `${formattedDate} • ${post.readingTime}`;
-}
-
-function getEmbedVideoUrl(url) {
-  const iframeSrcMatch = String(url || "").match(/src=["']([^"']+)["']/i);
-  if (iframeSrcMatch?.[1]) {
-    return iframeSrcMatch[1];
-  }
-
-  const youtubeMatch =
-    url.match(/youtube\.com\/watch\?v=([^&]+)/) ||
-    url.match(/youtu\.be\/([^?&]+)/) ||
-    url.match(/youtube\.com\/embed\/([^?&]+)/);
-
-  if (youtubeMatch) {
-    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-  }
-
-  return url;
-}
+    

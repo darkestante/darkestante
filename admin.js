@@ -102,6 +102,8 @@ function init() {
 function bindEvents() {
   elements.blogAdminLogin?.addEventListener("click", handleBlogAdminLogin);
   elements.blogAdminLogout?.addEventListener("click", handleBlogAdminLogout);
+  elements.blogAdminEmail?.addEventListener("keydown", handleBlogAdminKeydown);
+  elements.blogAdminPassword?.addEventListener("keydown", handleBlogAdminKeydown);
   elements.blogAdminForm?.addEventListener("submit", handleBlogPublish);
   elements.heroSlidesSave?.addEventListener("click", handleHeroSlidesSave);
   elements.blogBody?.addEventListener("input", syncReadingTimeEstimate);
@@ -147,6 +149,12 @@ function hydrateBlogDefaults() {
     elements.blogDate.value = new Date().toISOString().slice(0, 10);
   }
   syncReadingTimeEstimate();
+}
+
+function handleBlogAdminKeydown(event) {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  handleBlogAdminLogin();
 }
 
 function handleBlogAdminLogin() {
