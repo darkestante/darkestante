@@ -3,6 +3,7 @@ export const BLOG_POSTS = [
     "slug": "clipe-em-recife-2026-o-darkestante-marcou-presenca-no-circuito-literario-de-pernambuco",
     "title": "CLIPE em Recife 2026: O Darkestante marcou presença no Circuito Literário de Pernambuco.",
     "category": "Evento",
+    "author": "Bruno Cabral",
     "date": "2026-04-26",
     "readingTime": "2 min de leitura",
     "featured": true,
@@ -25,7 +26,7 @@ export const BLOG_POSTS = [
         ]
       }
     ],
-    "updatedAt": "2026-04-26T02:34:25.665Z"
+    "updatedAt": "2026-05-02T00:27:31.865Z"
   },
   {
     "slug": "eventos-literarios-no-darkestante",
