@@ -344,4 +344,98 @@ async function deleteBlogPostFromGitHubAttempt(slug, token, attempt) {
 
   if (!updateResponse.ok) {
     const details = await safeReadJson(updateResponse);
-    const message = details?.me
+    const message = details?.message || "Não foi possível excluir o artigo no GitHub.";
+
+    if (
+      attempt < 1 &&
+      typeof message === "string" &&
+      (message.includes("does not match") || message.includes("sha"))
+    ) {
+      return deleteBlogPostFromGitHubAttempt(slug, token, attempt + 1);
+    }
+
+    throw new Error(message);
+  }
+
+  return updateResponse.json();
+}
+
+function sortBlogPosts(a, b) {
+  if (Boolean(a.featured) !== Boolean(b.featured)) {
+    return a.featured ? -1 : 1;
+  }
+
+  const dateA = Date.parse(`${a.date || "1970-01-01"}T12:00:00`);
+  const dateB = Date.parse(`${b.date || "1970-01-01"}T12:00:00`);
+  return dateB - dateA;
+}
+
+function structuredCloneSafe(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function upsertPost(posts, nextPost) {
+  const existing = posts.filter((post) => post.slug !== nextPost.slug);
+  existing.unshift(structuredCloneSafe(nextPost));
+  return existing;
+}
+
+function formatBlogDataModule(posts) {
+  return `export const BLOG_POSTS = ${JSON.stringify(posts, null, 2)};\n`;
+}
+
+function parseBlogPostsModule(base64Content) {
+  const source = decodeBase64Utf8(base64Content);
+  const prefix = "export const BLOG_POSTS = ";
+  const start = source.indexOf(prefix);
+
+  if (start === -1) {
+    throw new Error("Não foi possível localizar BLOG_POSTS em blog-data.js.");
+  }
+
+  const arraySource = source.slice(start + prefix.length).trim().replace(/;\s*$/, "");
+  try {
+    const parsed = Function(`"use strict"; return (${arraySource});`)();
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    throw new Error("Não foi possível interpretar o conteúdo atual de blog-data.js no GitHub.");
+  }
+}
+
+function encodeBase64Utf8(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+}
+
+function decodeBase64Utf8(value) {
+  const normalized = String(value || "").replace(/\n/g, "");
+  const binary = atob(normalized);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+async function safeReadJson(response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function normalizeVideoValue(value) {
+  const input = String(value || "").trim();
+  if (!input) {
+    return "";
+  }
+
+  const iframeSrcMatch = input.match(/src=["']([^"']+)["']/i);
+  if (iframeSrcMatch?.[1]) {
+    return iframeSrcMatch[1];
+  }
+
+  return input;
+}
